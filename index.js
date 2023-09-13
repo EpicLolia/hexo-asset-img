@@ -45,10 +45,11 @@ function transform(img, fileName) {
 function action(data) {
     var reverseSource = data.source.split("").reverse().join("");
     var fileName = reverseSource.substring(3, reverseSource.indexOf("/")).split("").reverse().join("");
+    var escapedFileName = fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
     // ![example](postname/example.jpg)  -->  {% asset_img example.jpg example %}
-    var regExp = RegExp("!\\[(.*?)\\]\\(" + fileName + '/(.+?)\\)', "g");
-    var imgExp = RegExp("(<img.*?src=\"" + fileName + "/.+?\".*?>)", "g")
+    var regExp = RegExp("!\\[(.*?)\\]\\(" + escapedFileName + '[/\\\\](.+?)\\)', "g");
+    var imgExp = RegExp("(<img.*?src=\"" + escapedFileName + "/.+?\".*?>)", "g")
     // hexo g
     data.content = data.content.replace(regExp, "{% asset_img $2 $1 %}", "g");
     data.content = data.content.replace(imgExp, (match, img) => {return transform(img, fileName)}, "g")
